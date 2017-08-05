@@ -1,0 +1,19 @@
+{
+  "name": "raid-coordinator-bot",
+  "version": "1.0.0",
+  "description": "A Discord Bot to help coordinate meetups for raids in Pokémon Go.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexanderPatrick/raid-coordinator-bot.git"
+  },
+  "author": "Alexander Patrick <ajgp1989@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AlexanderPatrick/raid-coordinator-bot/issues"
+  },
+  "homepage": "https://github.com/AlexanderPatrick/raid-coordinator-bot#readme"
+}
