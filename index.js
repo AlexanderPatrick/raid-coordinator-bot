@@ -13,6 +13,47 @@ http.createServer((request, response) => {
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
+var raiderLists = {}
+client.on('message', (message) => {
+    if (message.content === '!coming') {
+        if (!raiderLists.hasOwnProperty(message.channel.id)) {
+            raiderLists[message.channel.id] = [];
+        }
+
+        if (raiderLists[message.channel.id].includes(message.member.displayName)) {
+            message.reply('Noted!');
+            return;
+        }
+        
+        raiderLists[message.channel.id].push(message.member.displayName);
+        message.reply('Noted.');
+    }
+
+    if (message.content === '!notcoming') {
+        if (!raiderLists.hasOwnProperty(message.channel.id)) {
+            raiderLists[message.channel.id] = [];
+        }
+
+        if (!raiderLists[message.channel.id].includes(message.member.displayName)) {
+            message.reply('Okay.');
+            return;
+        }
+        
+        raiderLists[message.channel.id].splice(raiderLists[message.channel.id].indexOf(message.member.displayName), 1);
+        message.reply('Noted.');
+    }
+
+    if (message.content === '!whocoming') {
+        if (!raiderLists.hasOwnProperty(message.channel.id) || raiderLists[message.channel.id].length == 0) {
+            message.channel.send('No one');
+            return;
+        }
+
+        var comingList = raiderLists[message.channel.id].join('\n');
+        message.channel.send(comingList);
+    }
+});
+
 client.on('ready', () => {
   console.log('Ready!');
 });
