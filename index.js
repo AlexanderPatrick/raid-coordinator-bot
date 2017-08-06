@@ -15,17 +15,26 @@ const client = new Discord.Client();
 
 var raiderLists = {}
 client.on('message', (message) => {
+    if (message.content === '!help') {
+        var helpText = '';
+        helpText += '!coming - mark yourself as coming to the raid.\n';
+        helpText += '!here - mark yourself as present at the raid.\n';
+        helpText += '!notcoming - unmark yourself.\n';
+        helpText += '!whocoming - list who is coming or here.\n';
+        message.channel.send(helpText);
+    }
+
     if (message.content === '!coming') {
         if (!raiderLists.hasOwnProperty(message.channel.id)) {
             raiderLists[message.channel.id] = [];
         }
 
-        if (raiderLists[message.channel.id].includes(message.member.displayName)) {
+        if (raiderLists[message.channel.id].map(raider => raider.name).includes(message.member.displayName)) {
             message.reply('Noted!');
             return;
         }
         
-        raiderLists[message.channel.id].push(message.member.displayName);
+        raiderLists[message.channel.id].push({name: message.member.displayName, here: false});
         message.reply('Noted.');
     }
 
@@ -39,7 +48,22 @@ client.on('message', (message) => {
             return;
         }
         
-        raiderLists[message.channel.id].splice(raiderLists[message.channel.id].indexOf(message.member.displayName), 1);
+        raiderLists[message.channel.id].splice(raiderLists[message.channel.id].map(raider => raider.name).indexOf(message.member.displayName), 1);
+        message.reply('Noted.');
+    }
+
+    if (message.content === '!here') {
+        if (!raiderLists.hasOwnProperty(message.channel.id)) {
+            raiderLists[message.channel.id] = [];
+        }
+
+        if (!raiderLists[message.channel.id].map(raider => raider.name).includes(message.member.displayName)) {
+            raiderLists[message.channel.id].push({name: message.member.displayName, here: true});
+            message.reply('Noted.');
+            return;
+        }
+        
+        raiderLists[message.channel.id][raiderLists[message.channel.id].map(raider => raider.name).indexOf(message.member.displayName)].here = true;
         message.reply('Noted.');
     }
 
@@ -49,7 +73,7 @@ client.on('message', (message) => {
             return;
         }
 
-        var comingList = raiderLists[message.channel.id].join('\n');
+        var comingList = raiderLists[message.channel.id].reduce((list, raider) => list + raider.name + (raider.here ? ' *Here*\n' : '\n'), '');
         message.channel.send(comingList);
     }
 });

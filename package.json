@@ -29,6 +29,10 @@
   "jest": {
     "verbose": true,
     "collectCoverage": true,
-    "collectCoverageFrom" : ["**/*.js", "!**/node_modules/**", "!**/coverage/**"]
+    "collectCoverageFrom": [
+      "**/*.js",
+      "!**/node_modules/**",
+      "!**/coverage/**"
+    ]
   }
 }
