@@ -43,7 +43,7 @@ client.on('message', (message) => {
             raiderLists[message.channel.id] = [];
         }
 
-        if (!raiderLists[message.channel.id].includes(message.member.displayName)) {
+        if (!raiderLists[message.channel.id].map(raider => raider.name).includes(message.member.displayName)) {
             message.reply('Okay.');
             return;
         }
