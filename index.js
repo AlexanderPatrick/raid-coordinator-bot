@@ -15,26 +15,38 @@ const client = new Discord.Client();
 
 var raiderLists = {}
 client.on('message', (message) => {
-    if (message.content === '!help') {
+    if (message.content === '?help') {
         var helpText = '';
-        helpText += '!coming - mark yourself as coming to the raid.\n';
+        helpText += '!coming [x2]- mark yourself (or x2) as coming to the raid.\n';
         helpText += '!here - mark yourself as present at the raid.\n';
         helpText += '!notcoming - unmark yourself.\n';
         helpText += '!whocoming - list who is coming or here.\n';
         message.channel.send(helpText);
     }
 
-    if (message.content === '!coming') {
+    if (/^!coming( x\d)?$/.test(message.content)) {
+        var match = message.content.match(/^!coming x(\d)$/);
+        var count = 1;
+        if (match != null && match.length == 2) {
+            count = parseInt(match[1]);
+        }
+
+        if (count == 0) {
+            message.reply('If you\'re not coming use !notcoming instead');
+            return;
+        }
+
         if (!raiderLists.hasOwnProperty(message.channel.id)) {
             raiderLists[message.channel.id] = [];
         }
 
         if (raiderLists[message.channel.id].map(raider => raider.name).includes(message.member.displayName)) {
+            raiderLists[message.channel.id][raiderLists[message.channel.id].map(raider => raider.name).indexOf(message.member.displayName)].count = count;
             message.reply('Noted!');
             return;
         }
         
-        raiderLists[message.channel.id].push({name: message.member.displayName, here: false});
+        raiderLists[message.channel.id].push({name: message.member.displayName, count: count, here: false});
         message.reply('Noted.');
     }
 
@@ -58,7 +70,7 @@ client.on('message', (message) => {
         }
 
         if (!raiderLists[message.channel.id].map(raider => raider.name).includes(message.member.displayName)) {
-            raiderLists[message.channel.id].push({name: message.member.displayName, here: true});
+            raiderLists[message.channel.id].push({name: message.member.displayName, count: 1, here: true});
             message.reply('Noted.');
             return;
         }
@@ -73,8 +85,10 @@ client.on('message', (message) => {
             return;
         }
 
-        var comingList = raiderLists[message.channel.id].reduce((list, raider) => list + raider.name + (raider.here ? ' *Here*\n' : '\n'), '');
-        message.channel.send(comingList);
+        var raiderCount = raiderLists[message.channel.id].reduce((sum, raider) => sum + raider.count, 0);
+        var raiderCountString = '*' + raiderCount + ' Player' + (raiderCount != 1 ? 's' : '') + '*\n';
+        var comingList = raiderLists[message.channel.id].reduce((list, raider) => list + raider.name + (raider.count > 1 ? ' *x' + raider.count + '*': '') + (raider.here ? ' - *Here*\n' : '\n'), '');
+        message.channel.send(raiderCountString + comingList);
     }
 });
 
