@@ -18,6 +18,7 @@ const addDefaultRaiderTallyToTallyListIfNotExist = require('./functions').addDef
 
 var raiderLists = {};
 var tallyLists = {};
+
 client.on('message', (message) => {
     if (message.content === '?help') {
         var helpText = '';
@@ -120,6 +121,37 @@ client.on('message', (message) => {
         var ranCount = tallyLists[message.channel.id].reduce((sum, raider) => sum + raider.ran, 0);
         var tallyString = '**Tally:** Caught: ' + caughtCount + ', Ran: ' + ranCount;
         message.channel.send(tallyString);
+    }
+
+    if (message.content.startsWith('!say')) {
+        if (message.guild.id != process.env['AUTHORISED_SERVER']) {
+            return;
+        }
+
+        var matches = message.content.match(/^!say `(.*)`\.`(.*)`(.*)/);
+        if (!matches) {
+            return;
+        }
+        var serverToSpeakIn = matches[1];
+        var channelToSpeakIn = matches[2];
+        var whatToSay = matches[3].trim();
+
+        if (whatToSay == '') {
+            return;
+        }
+
+        var guild = client.guilds.find(guild => guild.name == serverToSpeakIn);
+        if (guild === null) {
+            message.reply('Server ' + serverToSpeakIn + ' not found.');
+            return;
+        }
+        var channel = guild.channels.find(channel => channel.name == channelToSpeakIn);
+        if (channel === null) {
+            message.reply('Channel ' + channelToSpeakIn + ' not found.');
+            return;
+        }
+
+        channel.send(whatToSay);
     }
 });
 
