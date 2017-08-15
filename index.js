@@ -26,9 +26,11 @@ client.on('message', (message) => {
         helpText += '!here - mark yourself as present at the raid.\n';
         helpText += '!notcoming - unmark yourself.\n';
         helpText += '!whocoming - list who is coming or here.\n';
+        helpText += '!wholate - list who is coming but not here.\n';
         helpText += '!caught - lets the bot know that the pokemon was caught.\n';
         helpText += '!ran - lets the bot know that the pokemon ran.\n';
         helpText += '!tally - Shows the tally for who caught it or it ran from.\n';
+        helpText += '!maxcp - Shows the Max Encounter CP for raid pokemon.\n';
         message.channel.send(helpText);
     }
 
@@ -83,6 +85,22 @@ client.on('message', (message) => {
         message.channel.send(raiderCountString + comingList);
     }
 
+    if (message.content === '!wholate') {
+        if (!raiderLists.hasOwnProperty(message.channel.id) || raiderLists[message.channel.id].length == 0) {
+            message.channel.send('No one');
+            return;
+        }
+
+        var lateList = raiderLists[message.channel.id].filter(raider => !raider.here);
+        if (lateList.length == 0) {
+            message.channel.send('Everyone\'s Here.');
+            return;
+        }
+
+        var lateListString = lateList.reduce((list, raider) => list + raider.name + (raider.count > 1 ? ' *x' + raider.count + '*\n': '\n'), '');
+        message.channel.send(lateListString);
+    }
+
     if (/^!caught( x\d)?$/.test(message.content)) {
         var match = message.content.match(/^!caught x(\d)$/);
         var count = 1;
@@ -121,6 +139,10 @@ client.on('message', (message) => {
         var ranCount = tallyLists[message.channel.id].reduce((sum, raider) => sum + raider.ran, 0);
         var tallyString = '**Tally:** Caught: ' + caughtCount + ', Ran: ' + ranCount;
         message.channel.send(tallyString);
+    }
+
+    if (message.content === '!maxcp') {
+        message.channel.send('**Mewtwo:** *2275*\n**Tyranitar:** *2097*\n**Lugia:** *2056*\n**Snorlax:** *1917*\n**Zapdos:** *1902*\n**Moltres:** *1870*\n**Articuno:** *1676*\n**Lapras:** *1487*');
     }
 
     if (message.content.startsWith('!say')) {
