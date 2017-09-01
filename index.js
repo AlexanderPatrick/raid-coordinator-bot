@@ -161,7 +161,7 @@ client.on('message', (message) => {
         }
         var pokemon = matches[1].trim().toLowerCase();
         if (pokemon in maxCP) {
-            message.channel.reply(maxCP[pokemon]);
+            message.reply(maxCP[pokemon]);
         } else {
             message.channel.send('**Raikou** *1913*\n**Suicune** *1613*\n**Entei** *1930*\n**Mewtwo:** *2275*\n**Tyranitar:** *2097*\n**Lugia:** *2056*\n**Snorlax:** *1917*\n**Zapdos:** *1902*\n**Moltres:** *1870*\n**Articuno:** *1676*\n**Lapras:** *1487*');
         }
