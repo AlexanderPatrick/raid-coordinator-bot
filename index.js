@@ -18,6 +18,19 @@ const addDefaultRaiderTallyToTallyListIfNotExist = require('./functions').addDef
 
 var raiderLists = {};
 var tallyLists = {};
+var maxCP = {
+    'raikou':'1913',
+    'suicune':'1613',
+    'entei':'1930',
+    'mewtwo':'2275',
+    'lugia':'2056',
+    'articuno':'1676',
+    'zapdos':'1902',
+    'moltres':'1870',
+    'tyranitar':'2097',
+    'snorlax':'1917',
+    'lapras':'1487',
+};
 
 client.on('message', (message) => {
     if (message.content === '?help') {
@@ -30,7 +43,7 @@ client.on('message', (message) => {
         helpText += '!caught - lets the bot know that the pokemon was caught.\n';
         helpText += '!ran - lets the bot know that the pokemon ran.\n';
         helpText += '!tally - Shows the tally for who caught it or it ran from.\n';
-        helpText += '!maxcp - Shows the Max Encounter CP for raid pokemon.\n';
+        helpText += '!maxcp [pokemon] - Shows the Max Encounter CP for raid pokemon.\n';
         message.channel.send(helpText);
     }
 
@@ -141,8 +154,17 @@ client.on('message', (message) => {
         message.channel.send(tallyString);
     }
 
-    if (message.content === '!maxcp') {
-        message.channel.send('**Mewtwo:** *2275*\n**Tyranitar:** *2097*\n**Lugia:** *2056*\n**Snorlax:** *1917*\n**Zapdos:** *1902*\n**Moltres:** *1870*\n**Articuno:** *1676*\n**Lapras:** *1487*');
+    if (message.content.startsWith('!maxcp')) {
+        var matches = message.content.match(/^!maxcp(.*)$/);
+        if (!matches) {
+            return;
+        }
+        var pokemon = matches[1].trim().toLowerCase();
+        if (pokemon in maxCP) {
+            message.channel.reply(maxCP[pokemon]);
+        } else {
+            message.channel.send('**Raikou** *1913*\n**Suicune** *1613*\n**Entei** *1930*\n**Mewtwo:** *2275*\n**Tyranitar:** *2097*\n**Lugia:** *2056*\n**Snorlax:** *1917*\n**Zapdos:** *1902*\n**Moltres:** *1870*\n**Articuno:** *1676*\n**Lapras:** *1487*');
+        }
     }
 
     if (message.content.startsWith('!say')) {
