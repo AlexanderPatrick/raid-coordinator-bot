@@ -12,9 +12,12 @@ http.createServer((request, response) => {
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const schedule = require('node-schedule');
+
 const createListForChannelIfNotExists = require('./functions').createListForChannelIfNotExists;
 const addDefaultRaiderToRaiderListIfNotExist = require('./functions').addDefaultRaiderToRaiderListIfNotExist;
 const addDefaultRaiderTallyToTallyListIfNotExist = require('./functions').addDefaultRaiderTallyToTallyListIfNotExist;
+const superSay = require('./functions').superSay;
 
 var raiderLists = {};
 var tallyLists = {};
@@ -184,23 +187,27 @@ client.on('message', (message) => {
             return;
         }
 
-        var guild = client.guilds.find(guild => guild.name == serverToSpeakIn);
-        if (guild === null) {
-            message.reply('Server ' + serverToSpeakIn + ' not found.');
-            return;
+        try {
+            superSay(client, serverToSpeakIn, channelToSpeakIn, whatToSay);
+        } catch (err) {
+            message.reply(err.message);
         }
-        var channel = guild.channels.find(channel => channel.name == channelToSpeakIn);
-        if (channel === null) {
-            message.reply('Channel ' + channelToSpeakIn + ' not found.');
-            return;
-        }
-
-        channel.send(whatToSay);
     }
 });
 
+client.on('channelCreate', (channel) => {
+    superSay(client, channel.guild.name, 'general', `@everyone new raid channel, ${channel}`);
+});
+
 client.on('ready', () => {
-  console.log('Ready!');
+    console.log('Ready!');
+    var j = schedule.scheduleJob('0 0 0 * * 5', () => {
+        try {
+            superSay(client, 'Pokemon Go Raids Barbados','general', 'Reminder to reactivate GymHuntrBot');
+        } catch (err) {
+            console.log(err);
+        }
+    });
 });
 
 client.login(process.env['DISCORD_BOT_TOKEN'])
