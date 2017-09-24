@@ -51,6 +51,11 @@ client.on('message', (message) => {
     }
 
     if (/^!coming( x\d)?$/.test(message.content)) {
+        if (message.channel.name == 'general') {
+            message.reply('you should post this in the raid channel');
+            return;
+        }
+
         var match = message.content.match(/^!coming x(\d)$/);
         var count = 1;
         if (match != null && match.length == 2) {
@@ -70,6 +75,11 @@ client.on('message', (message) => {
     }
 
     if (message.content === '!notcoming') {
+        if (message.channel.name == 'general') {
+            message.reply('you should post this in the raid channel');
+            return;
+        }
+
         raiderLists = createListForChannelIfNotExists(raiderLists, message.channel.id);
 
         if (!raiderLists[message.channel.id].map(raider => raider.name).includes(message.member.displayName)) {
@@ -82,6 +92,11 @@ client.on('message', (message) => {
     }
 
     if (message.content === '!here') {
+        if (message.channel.name == 'general') {
+            message.reply('you should post this in the raid channel');
+            return;
+        }
+
         raiderLists = createListForChannelIfNotExists(raiderLists, message.channel.id);
         raiderLists[message.channel.id] = addDefaultRaiderToRaiderListIfNotExist(raiderLists[message.channel.id], message.member.displayName);
         
@@ -90,6 +105,11 @@ client.on('message', (message) => {
     }
 
     if (message.content === '!whocoming') {
+        if (message.channel.name == 'general') {
+            message.reply('you should post this in the raid channel');
+            return;
+        }
+
         if (!raiderLists.hasOwnProperty(message.channel.id) || raiderLists[message.channel.id].length == 0) {
             message.channel.send('No one');
             return;
@@ -102,6 +122,11 @@ client.on('message', (message) => {
     }
 
     if (message.content === '!wholate') {
+        if (message.channel.name == 'general') {
+            message.reply('you should post this in the raid channel');
+            return;
+        }
+
         if (!raiderLists.hasOwnProperty(message.channel.id) || raiderLists[message.channel.id].length == 0) {
             message.channel.send('No one');
             return;
@@ -118,6 +143,11 @@ client.on('message', (message) => {
     }
 
     if (/^!caught( x\d)?$/.test(message.content)) {
+        if (message.channel.name == 'general') {
+            message.reply('you should post this in the raid channel');
+            return;
+        }
+
         var match = message.content.match(/^!caught x(\d)$/);
         var count = 1;
         if (match != null && match.length == 2) {
@@ -132,6 +162,11 @@ client.on('message', (message) => {
     }
 
     if (/^!ran( x\d)?$/.test(message.content)) {
+        if (message.channel.name == 'general') {
+            message.reply('you should post this in the raid channel');
+            return;
+        }
+
         var match = message.content.match(/^!ran x(\d)$/);
         var count = 1;
         if (match != null && match.length == 2) {
@@ -146,6 +181,11 @@ client.on('message', (message) => {
     }
 
     if (message.content === '!tally') {
+        if (message.channel.name == 'general') {
+            message.reply('you should post this in the raid channel');
+            return;
+        }
+
         if (!tallyLists.hasOwnProperty(message.channel.id) || tallyLists[message.channel.id].length == 0) {
             message.channel.send('**Tally:** Caught: 0, Ran:0');
             return;
