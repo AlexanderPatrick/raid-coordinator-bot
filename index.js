@@ -13,7 +13,7 @@ http.createServer((request, response) => {
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const schedule = require('node-schedule');
-var moment = require('moment');
+var moment = require('moment-timezone');
 
 const createListForChannelIfNotExists = require('./functions').createListForChannelIfNotExists;
 const addDefaultRaiderToRaiderListIfNotExist = require('./functions').addDefaultRaiderToRaiderListIfNotExist;
@@ -243,8 +243,8 @@ client.on('message', (message) => {
 
                     raidStarting = moment(raidStarting).add({hours: startingHours, minutes: startingMinutes, seconds: startingSeconds});
                     var raidEnding = moment(raidStarting).add({minutes: 45});
-                    var raidStartingString = raidStarting.format('LT');
-                    var raidEndingString = raidEnding.format('LT');
+                    var raidStartingString = raidStarting.tz('America/Barbados').format('LT');
+                    var raidEndingString = raidEnding.tz('America/Barbados').format('LT');
 
                     var raidStarted = moment(raidEnding).subtract({hours: 1, minutes: 45});
 
@@ -273,7 +273,7 @@ client.on('message', (message) => {
                     var raidEnding = new Date(message.createdTimestamp);
                     raidEnding = moment(raidEnding).add({hours: endingHours, minutes: endingMinutes, seconds: endingSeconds});
                     var raidStarted = moment(raidEnding).subtract({hours: 1, minutes: 45});
-                    var raidEndingString = raidEnding.format('LT');
+                    var raidEndingString = raidEnding.tz('America/Barbados').format('LT');
 
                     var raidEmbed = new Discord.RichEmbed()
                         .setTitle('Level ' + tier + ' Raid has started!')
