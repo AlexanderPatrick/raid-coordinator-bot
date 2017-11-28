@@ -13,6 +13,7 @@ http.createServer((request, response) => {
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const schedule = require('node-schedule');
+var moment = require('moment');
 
 const createListForChannelIfNotExists = require('./functions').createListForChannelIfNotExists;
 const addDefaultRaiderToRaiderListIfNotExist = require('./functions').addDefaultRaiderToRaiderListIfNotExist;
@@ -22,6 +23,7 @@ const superSay = require('./functions').superSay;
 var raiderLists = {};
 var tallyLists = {};
 var maxCP = {
+    'ho-oh':'2222',
     'raikou':'1913',
     'suicune':'1613',
     'entei':'1930',
@@ -33,6 +35,11 @@ var maxCP = {
     'tyranitar':'2097',
     'snorlax':'1917',
     'lapras':'1487',
+    'golem':'1666',
+    'victreebel':'1296',
+    'poliwrath':'1395',
+    'nidoking':'1363',
+    'nidoqueen':'1336',
 };
 
 client.on('message', (message) => {
@@ -46,7 +53,7 @@ client.on('message', (message) => {
         helpText += '!caught - lets the bot know that the pokemon was caught.\n';
         helpText += '!ran - lets the bot know that the pokemon ran.\n';
         helpText += '!tally - Shows the tally for who caught it or it ran from.\n';
-        helpText += '!maxcp [pokemon] - Shows the Max Encounter CP for raid pokemon.\n';
+        helpText += '!maxcp pokemon - Shows the Max Encounter CP for raid pokemon.\n';
         message.channel.send(helpText);
     }
 
@@ -206,7 +213,80 @@ client.on('message', (message) => {
         if (pokemon in maxCP) {
             message.reply(maxCP[pokemon]);
         } else {
-            message.channel.send('**Raikou** *1913*\n**Suicune** *1613*\n**Entei** *1930*\n**Mewtwo:** *2275*\n**Tyranitar:** *2097*\n**Lugia:** *2056*\n**Snorlax:** *1917*\n**Zapdos:** *1902*\n**Moltres:** *1870*\n**Articuno:** *1676*\n**Lapras:** *1487*');
+            message.channel.send('**Ho-oh** *2222*\n**Raikou** *1913*\n**Suicune** *1613*\n**Entei** *1930*\n**Mewtwo:** *2275*\n**Tyranitar:** *2097*\n**Lugia:** *2056*\n**Snorlax:** *1917*\n**Zapdos:** *1902*\n**Moltres:** *1870*\n**Articuno:** *1676*\n**Lapras:** *1487*');
+        }
+    }
+
+    var channelsToListenTo = [
+        'announcements-north',
+        'announcements-south',
+    ];
+    if (message.author.username == 'GymHuntrBot') {
+        if (channelsToListenTo.includes(message.channel.name)) {
+            if (message.hasOwnProperty('embeds')) {
+                if (message.embeds.length == 0) {
+                    return;
+                }
+                if (!('description' in message.embeds[0])) {
+                    return;
+                }
+
+                // Egg Mode
+                if (/^\*\*(.+)\.\*\*\n\*Raid Starting: (\d+) hours (\d+) min (\d+) sec\*$/.test(message.embeds[0].description)) {
+                    var tier = message.embeds[0].title.match(/^Level (\d) Raid is starting soon!$/)[1];
+                    var matches = message.embeds[0].description.match(/^\*\*(.+)\.\*\*\n\*Raid Starting: (\d+) hours (\d+) min (\d+) sec\*$/);
+                    var gym = matches[1].trim();
+                    var startingHours = matches[2];
+                    var startingMinutes = matches[3];
+                    var startingSeconds = matches[4];
+                    var raidStarting = new Date(message.createdTimestamp);
+
+                    raidStarting = moment(raidStarting).add({hours: startingHours, minutes: startingMinutes, seconds: startingSeconds});
+                    var raidEnding = moment(raidStarting).add({minutes: 45});
+                    var raidStartingString = raidStarting.format('LT');
+                    var raidEndingString = raidEnding.format('LT');
+
+                    var raidStarted = moment(raidEnding).subtract({hours: 1, minutes: 45});
+
+                    var eggEmbed = new Discord.RichEmbed()
+                        .setTitle('Level ' + tier + ' Raid is starting soon!')
+                        .setColor(255 + (128*256))
+                        .setDescription('**' + gym + '**\n*Raid Starting: ' + raidStartingString + '*' + '\n*Raid Ending: ' + raidEndingString + '*')
+                        .setThumbnail(message.embeds[0].thumbnail.url)
+                        .setURL(message.embeds[0].url)
+                        .setTimestamp();
+
+                    message.guild.channels.find(channel => channel.name == 'announcements').send({embed: eggEmbed}).catch( e => console.error('Message Not Sent', e) );
+                }
+
+                // Raid Started
+                if (/^\*\*(.+)\.\*\*\n(.+)\nCP: (\d+)\.\n\*Raid Ending: (\d+) hours (\d+) min (\d+) sec\*$/.test(message.embeds[0].description)) {
+                    var tier = message.embeds[0].title.match(/^Level (\d) Raid has started!$/)[1];
+                    var matches = message.embeds[0].description.match(/^\*\*(.+)\.\*\*\n(.+)\nCP: (\d+)\.\n\*Raid Ending: (\d+) hours (\d+) min (\d+) sec\*$/);
+                    var gym = matches[1].trim();
+                    var pokemon = matches[2].trim();
+                    var cp = matches[3];
+                    var endingHours = matches[4];
+                    var endingMinutes = matches[5];
+                    var endingSeconds = matches[6]; 
+                    
+                    var raidEnding = new Date(message.createdTimestamp);
+                    raidEnding = moment(raidEnding).add({hours: endingHours, minutes: endingMinutes, seconds: endingSeconds});
+                    var raidStarted = moment(raidEnding).subtract({hours: 1, minutes: 45});
+                    var raidEndingString = raidEnding.format('LT');
+
+                    var raidEmbed = new Discord.RichEmbed()
+                        .setTitle('Level ' + tier + ' Raid has started!')
+                        .setColor(255*256)
+                        .setDescription('**' + gym + '**\n' + pokemon + '\nCP: ' + cp + '.\n*Raid Ending: ' + raidEndingString + '*')
+                        .setThumbnail(message.embeds[0].thumbnail.url)
+                        .setURL(message.embeds[0].url)
+                        .setTimestamp();
+
+                    message.guild.channels.find(channel => channel.name == 'announcements').send({embed: raidEmbed}).catch(e => console.error('Message Not Sent', e));
+                }
+
+            }
         }
     }
 
