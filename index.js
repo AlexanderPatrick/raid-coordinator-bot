@@ -260,15 +260,18 @@ client.on('message', (message) => {
                 }
 
                 // Raid Started
-                if (/^\*\*(.+)\.\*\*\n(.+)\nCP: (\d+)\.\n\*Raid Ending: (\d+) hours (\d+) min (\d+) sec\*$/.test(message.embeds[0].description)) {
+                var raidRegExp = /^\*\*(.+)\.\*\*\n(.+)\n\*\*CP:\*\* (\d+) - \*\*Moves:\*\*([^/]*)\/([^\n]*)\n\*Raid Ending: (\d+) hours (\d+) min (\d+) sec\*$/;
+                if (raidRegExp.test(message.embeds[0].description)) {
                     var tier = message.embeds[0].title.match(/^Level (\d) Raid has started!$/)[1];
-                    var matches = message.embeds[0].description.match(/^\*\*(.+)\.\*\*\n(.+)\nCP: (\d+)\.\n\*Raid Ending: (\d+) hours (\d+) min (\d+) sec\*$/);
+                    var matches = message.embeds[0].description.match(raidRegExp);
                     var gym = matches[1].trim();
                     var pokemon = matches[2].trim();
                     var cp = matches[3];
-                    var endingHours = matches[4];
-                    var endingMinutes = matches[5];
-                    var endingSeconds = matches[6]; 
+                    var fastMove = matches[4].trim();
+                    var chargedMove = matches[5].trim();
+                    var endingHours = matches[6];
+                    var endingMinutes = matches[7];
+                    var endingSeconds = matches[8]; 
                     
                     var raidEnding = new Date(message.createdTimestamp);
                     raidEnding = moment(raidEnding).add({hours: endingHours, minutes: endingMinutes, seconds: endingSeconds});
@@ -278,7 +281,7 @@ client.on('message', (message) => {
                     var raidEmbed = new Discord.RichEmbed()
                         .setTitle('Level ' + tier + ' Raid has started!')
                         .setColor(255*256)
-                        .setDescription('**' + gym + '**\n' + pokemon + '\nCP: ' + cp + '.\n*Raid Ending: ' + raidEndingString + '*')
+                        .setDescription('**' + gym + '**\n' + pokemon + '\n**CP:** ' + cp + '\n**Moves:** ' + fastMove + '/' + chargedMove + '\n*Raid Ending: ' + raidEndingString + '*')
                         .setThumbnail(message.embeds[0].thumbnail.url)
                         .setURL(message.embeds[0].url)
                         .setTimestamp();
