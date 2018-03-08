@@ -44,7 +44,7 @@ client.on('message', (message) => {
     }
 
     if (message.content === '!raidcp2') {
-        message.channel.send('Raid Boss CP chart. Credit to @NidosPokemonGo', {files:['./raidcp2.jpg']});
+        message.channel.send('Raid Boss CP chart. Credit to u/Gabrielense', {files:['./raidcp2.jpg']});
     }
 
     if (/^!coming( x\d)?$/.test(message.content)) {
