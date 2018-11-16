@@ -35,11 +35,16 @@ client.on('message', (message) => {
         helpText += '!ran - lets the bot know that the pokemon ran.\n';
         helpText += '!tally - Shows the tally for who caught it or it ran from.\n';
         helpText += '!raidcp - Shows a graphic For Encounter CP ranges for raid pokemon.\n';
+        helpText += '!raidcp2 - Shows a graphic For Encounter CP ranges for raid pokemon.\n';
         message.channel.send(helpText);
     }
 
     if (message.content === '!raidcp') {
         message.channel.send('Raid Boss CP Ranges. Credit to u/Gabrielense', {files:['./raidcp.jpeg']});
+    }
+
+    if (message.content === '!raidcp2') {
+        message.channel.send('Raid Boss CP chart. Credit to u/Gabrielense', {files:['./raidcp2.jpg']});
     }
 
     if (/^!coming( x\d)?$/.test(message.content)) {
