@@ -296,13 +296,13 @@ client.on('channelCreate', (channel) => {
 
 client.on('ready', () => {
     console.log('Ready!');
-    var j = schedule.scheduleJob('0 0 0 * * 5', () => {
-        try {
-            superSay(client, 'Pokemon Go Raids Barbados','general', 'Reminder to reactivate GymHuntrBot');
-        } catch (err) {
-            console.log(err);
-        }
-    });
+    // var j = schedule.scheduleJob('0 0 0 * * 5', () => {
+    //     try {
+    //         superSay(client, 'Pokemon Go Raids Barbados','general', 'Reminder to reactivate GymHuntrBot');
+    //     } catch (err) {
+    //         console.log(err);
+    //     }
+    // });
 });
 
 client.login(process.env['DISCORD_BOT_TOKEN'])
