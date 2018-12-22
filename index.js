@@ -28,7 +28,7 @@ const superSay = require('./functions').superSay;
 var raiderLists = {};
 var tallyLists = {};
 
-client.on('message', (message) => {
+client.on('message', async (message) => {
     if (message.content === '?help') {
         var helpText = '';
         helpText += '!coming [x2]- mark yourself (or x2) as coming to the raid.\n';
