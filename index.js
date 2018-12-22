@@ -139,6 +139,11 @@ client.on('message', (message) => {
             message.channel.send('Everyone\'s Here.');
             return;
         }
+        
+        if (message.author.username == 'Mikharo' /* && Math.random() < 0.99 */) {
+            message.channel.send('The answer is always Jabarri so stop asking!!!');
+            return;
+        }
 
         var lateListString = lateList.reduce((list, raider) => list + raider.name + (raider.count > 1 ? ' *x' + raider.count + '*\n': '\n'), '');
         message.channel.send(lateListString);
