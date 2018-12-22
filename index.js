@@ -14,6 +14,11 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const schedule = require('node-schedule');
 var moment = require('moment-timezone');
+const { Pool } = require('pg');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: true
+});
 
 const createListForChannelIfNotExists = require('./functions').createListForChannelIfNotExists;
 const addDefaultRaiderToRaiderListIfNotExist = require('./functions').addDefaultRaiderToRaiderListIfNotExist;
@@ -193,6 +198,43 @@ client.on('message', (message) => {
         var tallyString = '**Tally:** Caught: ' + caughtCount + ', Ran: ' + ranCount;
         message.channel.send(tallyString);
     }
+
+    if (message.content === '!profile') {
+        try {
+            const client = await pool.connect();
+            const result = await client.query(`SELECT team FROM profile WHERE id='${message.author.id}'`);
+            const results = { 'results': (result) ? result.rows : null};
+            if (!results) {
+                message.reply('No Profile found.');
+            } else {
+                message.reply(results);
+            }
+            client.release();
+        } catch (err) {
+            console.error(err);
+            message.reply("There was an Error.");
+        }
+    }
+
+    if (/^!team (Mystic|Valor|Instinct)$/.test(message.content)) {
+        const match = message.content.match(/^!team (Mystic|Valor|Instinct)$/);
+        if (match == null || match.length != 2) {
+            message.reply('The format is "!team Mystic", "!team Valor" or "!team Instinct"');
+            return;
+        }
+        const team = match[1];
+        try {
+            const client = await pool.connect();
+            let result = await client.query(`UPDATE profile SET team='${team}' WHERE id='${message.author.id}'`);
+            result = await client.query(`INSERT INTO profile (id, team) SELECT '${message.author.id}', '${team}' WHERE NOT EXISTS (SELECT 1 FROM profile WHERE id='${message.author.id}'`);
+            message.reply(`Team set to ${team}`);
+            client.release();
+        } catch (err) {
+            console.error(err);
+            message.reply("There was an Error.");
+        }
+    }
+
 
     var channelsToListenTo = [
         'announcements-north',
