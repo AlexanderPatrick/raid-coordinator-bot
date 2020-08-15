@@ -43,7 +43,7 @@ client.on('message', async (message) => {
         helpText += '!invite - To be remotely invited to a raid.\n';
         helpText += '!notinvite - To not be remotely invited to a raid.\n';
         helpText += '!whotoinvite - list who to remotely invite.\n';
-        helpText += '!whotraiding - list who wants to do the raid.\n';
+        helpText += '!whoraiding - list who wants to do the raid.\n';
         message.channel.send(helpText);
     }
     
