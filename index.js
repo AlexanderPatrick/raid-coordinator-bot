@@ -41,7 +41,9 @@ client.on('message', async (message) => {
         helpText += '!ran - lets the bot know that the pokemon ran.\n';
         helpText += '!tally - Shows the tally for who caught it or it ran from.\n';
         helpText += '!invite - To be remotely invited to a raid.\n';
+        helpText += '!notinvite - To not be remotely invited to a raid.\n';
         helpText += '!whotoinvite - list who to remotely invite.\n';
+        helpText += '!whotraiding - list who wants to do the raid.\n';
         message.channel.send(helpText);
     }
     
@@ -55,6 +57,23 @@ client.on('message', async (message) => {
         remoteLists[message.channel.id] = addDefaultRaiderToRaiderListIfNotExist(remoteLists[message.channel.id], message.member.displayName);
         
         remoteLists[message.channel.id][remoteLists[message.channel.id].map(raider => raider.name).indexOf(message.member.displayName)].count = 1;
+        message.reply('Noted.');
+    }
+    
+    if (message.content === '!notinvite') {
+        if (message.channel.name == 'general') {
+            message.reply('you should post this in the raid channel');
+            return;
+        }
+
+        remoteLists = createListForChannelIfNotExists(remoteLists, message.channel.id);
+
+        if (!remoteLists[message.channel.id].map(raider => raider.name).includes(message.member.displayName)) {
+            message.reply('Okay.');
+            return;
+        }
+        
+        remoteLists[message.channel.id].splice(remoteLists[message.channel.id].map(raider => raider.name).indexOf(message.member.displayName), 1);
         message.reply('Noted.');
     }
 
@@ -144,6 +163,36 @@ client.on('message', async (message) => {
         var raiderCountString = '*' + raiderCount + ' Player' + (raiderCount != 1 ? 's' : '') + '*\n';
         var inviteList = remoteLists[message.channel.id].reduce((list, raider) => list + raider.name + '\n', '');
         message.channel.send(raiderCountString + inviteList);
+    }
+    
+    if (message.content === '!whoraiding') {
+        if (message.channel.name == 'general') {
+            message.reply('you should post this in the raid channel');
+            return;
+        }
+
+        if ((!raiderLists.hasOwnProperty(message.channel.id) || raiderLists[message.channel.id].length == 0) && (!remoteLists.hasOwnProperty(message.channel.id) || remoteLists[message.channel.id].length == 0)) {
+            message.channel.send('No one');
+            return;
+        }
+        
+        var raidersMessage = '';
+        
+        if (raiderLists.hasOwnProperty(message.channel.id) && raiderLists[message.channel.id].length > 0) {
+            var raiderCount = raiderLists[message.channel.id].reduce((sum, raider) => sum + raider.count, 0);
+            var raiderCountString = '*' + raiderCount + ' Player' + (raiderCount != 1 ? 's' : '') + '*\n';
+            var comingList = raiderLists[message.channel.id].reduce((list, raider) => list + raider.name + (raider.count > 1 ? ' *x' + raider.count + '*': '') + (raider.here ? ' - *Here*\n' : '\n'), '');
+            raidersMessage += '**Physical:**\n' + raiderCountString + comingList + '\n';
+        }
+    
+        if (remoteLists.hasOwnProperty(message.channel.id) && remoteLists[message.channel.id].length > 0) {
+            var remoteCount = remoteLists[message.channel.id].reduce((sum, raider) => sum + raider.count, 0);
+            var remoteCountString = '*' + remoteCount + ' Player' + (remoteCount != 1 ? 's' : '') + '*\n';
+            var inviteList = remoteLists[message.channel.id].reduce((list, raider) => list + raider.name + '\n', '');
+            raidersMessage += '**Remote:**\n' + remoteCountString + inviteList;
+        }
+
+        message.channel.send(raidersMessage);
     }
 
     if (message.content === '!wholate') {
