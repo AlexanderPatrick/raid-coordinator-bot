@@ -415,7 +415,7 @@ client.on('message', async (message) => {
 });
 
 client.on('channelCreate', (channel) => {
-    superSay(client, channel.guild.name, 'general', `@everyone new raid channel, ${channel}`);
+    // superSay(client, channel.guild.name, 'general', `@everyone new raid channel, ${channel}`);
 });
 
 client.on('ready', () => {
